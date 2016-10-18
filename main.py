@@ -22,9 +22,14 @@ config.read(maincfg_filename)
 
 auth_token=config['rhodecode']['auth_token']
 url=config['rhodecode']['url']
-mail_from=config['email']['from']
-mail_to=config['email']['to']
 base_url=url.split("_admin")[0]
+
+do_email=config.getboolean('main', 'email', fallback=False)
+if do_email:
+	mail_from=config['email']['from']
+	mail_to=config['email']['to']
+	mail_host=config['email']['host']
+	mail_subject=config['email']['subject']
 
 
 txt_template="""Hello, here are the commits for {date}
@@ -74,6 +79,18 @@ for repository in repositories:
 
 datenow = datetime.datetime.now().strftime("%Y-%m-%d")
 fulltxt = txt_template.format(date=datenow, body='\n'.join(commitbody['txt']))
-print(fulltxt)
+
+if do_email:
+	server=smtplib.SMTP('localhost')
+	message=email.message.EmailMessage()
+	message['Subject'] = mail_subject.format(date=datenow)
+	essage['From'] = mail_from
+	message['To'] = mail_to
+	message.set_content(fulltxt)
+	server.send_message(message, mail_from, mail_to)
+else:
+	print(fulltxt)
+
+print("All done.")
 
 sys.exit(0)
