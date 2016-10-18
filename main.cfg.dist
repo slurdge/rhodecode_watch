@@ -1,0 +1,7 @@
+[rhodecode]
+	auth_token=1234567890a
+	url=https://your.rhodecode.domain.com/_admin/api
+[email]
+	from=rhodecode_watch@domain.com
+	to=rhodecode_watcher@domain.com
+	
