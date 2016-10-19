@@ -8,3 +8,4 @@
 	to=rhodecode_watcher@domain.com
 	host=localhost
 	subject=[rhodecode] Commits for {date}
+	dateformat=%%Y-%%m-%%d # percent sign must be escaped once
