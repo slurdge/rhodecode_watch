@@ -3,6 +3,7 @@
 	url=https://your.rhodecode.domain.com/_admin/api
 [main]
 	email=false
+	repotrack=false
 [email]
 	from=rhodecode_watch@domain.com
 	to=rhodecode_watcher@domain.com

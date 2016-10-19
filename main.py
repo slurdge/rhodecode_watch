@@ -31,6 +31,12 @@ if do_email:
 	mail_host=config['email']['host']
 	mail_subject=config['email']['subject']
 
+do_repotrack=config.getboolean('main','repotrack',fallback=False)
+if do_repotrack and os.path.exists('repositories.txt'):
+	oldrepositories=open('repositories.txt', 'r').readlines()
+	oldrepositories=[x for x in oldrepositories if x.strip() != ""]
+else:
+	oldrepositories=[]
 
 txt_template="""Hello, here are the commits for {date}
 {body}
@@ -61,6 +67,13 @@ print("Getting repositories...")
 repositories = make_request("get_repos")
 print("Got {} repositories".format(len(repositories)))
 commitbody = {"txt":["Fetched {} repositories".format(len(repositories))], "html":[]}
+if do_repotrack:
+	reponames=[repository['repo_name'] for repository in repositories]
+	newrepositories = [repository for repository in reponames if repository not in oldrepositories]
+	if len(newrepositories) != 0:
+		commitbody['txt'].append("New repositories:")
+		commitbody['txt'].append("\n".join(newrepositories))
+	open('repositories.txt', 'w').write('\n'.join(reponames))
 for repository in repositories:
 	name, type_, repid, rev = repository["repo_name"], repository["repo_type"], repository["repo_id"], repository["last_changeset"]["revision"]
 	if rev >= 0:
