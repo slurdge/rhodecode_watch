@@ -30,6 +30,7 @@ if do_email:
 	mail_to=config['email']['to']
 	mail_host=config['email']['host']
 	mail_subject=config['email']['subject']
+	dateformat=config['email']['dateformat']
 
 
 txt_template="""Hello, here are the commits for {date}
@@ -77,7 +78,7 @@ for repository in repositories:
 					change['long_url'] = '{base_url}{name}/changeset/{id}'.format(base_url=base_url, name=name, id=change['raw_id'])
 					commitbody['txt'].append(txt_commit_format.format(**change))
 
-datenow = datetime.datetime.now().strftime("%Y-%m-%d")
+datenow = datetime.datetime.now().strftime(dateformat)
 fulltxt = txt_template.format(date=datenow, body='\n'.join(commitbody['txt']))
 
 if do_email:
