@@ -1,6 +1,7 @@
 [rhodecode]
 	auth_token=1234567890a
 	url=https://your.rhodecode.domain.com/_admin/api
+	number_of_commits=20
 [main]
 	email=false
 	repotrack=false

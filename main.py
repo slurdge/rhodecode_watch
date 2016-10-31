@@ -23,6 +23,7 @@ config.read(maincfg_filename)
 auth_token=config['rhodecode']['auth_token']
 url=config['rhodecode']['url']
 base_url=url.split("_admin")[0]
+numhistory=config.getint('rhodecode','number_of_commits', fallback=20)
 
 do_email=config.getboolean('main', 'email', fallback=False)
 if do_email:
@@ -83,8 +84,8 @@ for repository in repositories:
 			repoline = "\n\nLatest commits for {name} (type: {type}, id: {id})".format(name=name, type=type_, id=repid)
 			print('Getting commits for {} (type: {}, id {})'.format(name, type_, repid))
 			commitbody['txt'].append(repoline)
-			start_rev = max(0, rev-19)
-			changes = make_request("get_repo_changesets", repoid=repid, details="basic", start_rev=str(start_rev), limit=20)
+			start_rev = max(0, rev-numhistory+1)
+			changes = make_request("get_repo_changesets", repoid=repid, details="basic", start_rev=str(start_rev), limit=numhistory)
 			for change in changes:
 				change_date =  get_rh_date(change["date"])
 				if change_date > initialdate:
