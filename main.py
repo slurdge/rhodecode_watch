@@ -40,12 +40,10 @@ if do_repotrack and os.path.exists('repositories.txt'):
 else:
 	oldrepositories=[]
 
-txt_template="""Hello, here are the commits for {date}
+header_template="""Hello, here are the commits for {date}
 {body}
 """
-
-txt_commit_format="""\n#{short_id} {author} : {message}\n{long_url}"""
-html_commit_format="""<a href="{long_url}">{short_id} {author} : {message}</a>"""
+commit_format="""\n#{short_id} {author} : {message}\n{long_url}"""
 
 id_ = random.randint(0,2**32)
 
@@ -68,13 +66,13 @@ initialdate = datetime.datetime.utcnow() + datetime.timedelta(days=-1)
 print("Getting repositories...")
 repositories = make_request("get_repos")
 print("Got {} repositories".format(len(repositories)))
-commitbody = {"txt":["Fetched {} repositories".format(len(repositories))], "html":[]}
+commitbody = ["Fetched {} repositories".format(len(repositories))]
 if do_repotrack:
 	reponames=[repository['repo_name'] for repository in repositories]
 	newrepositories = [repository for repository in reponames if repository not in oldrepositories]
 	if len(newrepositories) != 0:
-		commitbody['txt'].append("New repositories:")
-		commitbody['txt'].append("\n".join(newrepositories))
+		commitbody.append("New repositories:")
+		commitbody.append("\n".join(newrepositories))
 	open('repositories.txt', 'w').write('\n'.join(reponames))
 for repository in repositories:
 	name, type_, repid, rev = repository["repo_name"], repository["repo_type"], repository["repo_id"], repository["last_changeset"]["revision"]
@@ -83,17 +81,17 @@ for repository in repositories:
 		if latest >= initialdate:
 			repoline = "\n\nLatest commits for {name} (type: {type}, id: {id})".format(name=name, type=type_, id=repid)
 			print('Getting commits for {} (type: {}, id {})'.format(name, type_, repid))
-			commitbody['txt'].append(repoline)
+			commitbody.append(repoline)
 			start_rev = max(0, rev-numhistory+1)
 			changes = make_request("get_repo_changesets", repoid=repid, details="basic", start_rev=str(start_rev), limit=numhistory)
 			for change in changes:
 				change_date =  get_rh_date(change["date"])
 				if change_date > initialdate:
 					change['long_url'] = '{base_url}{name}/changeset/{id}'.format(base_url=base_url, name=name, id=change['raw_id'])
-					commitbody['txt'].append(txt_commit_format.format(**change))
+					commitbody.append(commit_format.format(**change))
 
 datenow = datetime.datetime.now().strftime(dateformat)
-fulltxt = txt_template.format(date=datenow, body='\n'.join(commitbody['txt']))
+fulltxt = header_template.format(date=datenow, body='\n'.join(commitbody))
 
 if do_email:
 	server=smtplib.SMTP('localhost')
