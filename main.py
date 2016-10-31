@@ -23,7 +23,7 @@ config.read(maincfg_filename)
 auth_token=config['rhodecode']['auth_token']
 url=config['rhodecode']['url']
 base_url=url.split("_admin")[0]
-numhistory=config.getint('rhodecode','numhistory', fallback=20)
+numhistory=config.getint('rhodecode','number_of_commits', fallback=20)
 
 do_email=config.getboolean('main', 'email', fallback=False)
 if do_email:
